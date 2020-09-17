@@ -1,0 +1,35 @@
+#include <SPI.h>
+#include <nRF24L01.h>
+#include <RF24.h>
+
+bool buttonState1;
+
+RF24 radio(9, 10); // CE, CSN
+const byte address[6] = "00006";
+
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(2, OUTPUT);
+  pinMode(3, OUTPUT);
+  digitalWrite(3,0);
+  radio.begin();
+  radio.setPALevel(RF24_PA_MAX);
+  radio.setDataRate(RF24_250KBPS);
+  radio.openReadingPipe(0, address);
+}
+
+void loop() {
+  radio.openReadingPipe(0, address);
+  radio.startListening();
+  while (radio.available())
+ { radio.read(&buttonState1, sizeof(buttonState1));
+  Serial.println(buttonState1);}
+
+  if (buttonState1 == 1) {
+    digitalWrite(2, HIGH);
+  }
+  else  if (buttonState1 == 0) {
+    digitalWrite(2, LOW);
+  }
+}
